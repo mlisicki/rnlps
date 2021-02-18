@@ -22,7 +22,7 @@ def main():
             for d in os.listdir(args.directory) if not d.startswith('_')]
     dirs = [d for d in dirs if os.path.isdir(d)]
 
-    cmds = ['python3 run.py {0}'.format(d) for d in dirs]
+    cmds = ['python3 rnlps/scripts/run.py {0}'.format(d) for d in dirs]
 
     tokens = []
     for j in range(args.jobs):
