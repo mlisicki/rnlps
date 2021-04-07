@@ -34,6 +34,7 @@ def main():
 
 
     df = pd.read_csv("policy_mean_perf.csv")
+    print(df)
 
     # Considering only the neural policies here-
 
@@ -59,8 +60,8 @@ def main():
     data=df, markers=True, marker ='.', markersize=12)
 
     handles, labels = plt.gca().get_legend_handles_labels()
-    order = [1,2]
-    plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
+    #order = [1,2]
+    #plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order])
 
     # Turn off x-ticks
     plt.tick_params(

@@ -64,7 +64,7 @@ def main():
                                   train_every=[32],
                                   std_targets=[0.1],
                                   std_weights=[0.5],
-                                  verbose=[False],
+                                  verbose=[True],
                                   seed=seeds))
 
     # Policy settings grid (Neural-linear)

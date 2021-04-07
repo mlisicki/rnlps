@@ -13,6 +13,7 @@
 import os
 import argparse
 import pandas as pd
+pd.options.mode.chained_assignment = None
 
 
 def main():
@@ -44,11 +45,10 @@ def main():
     d2 = d2.sort_values(by='Return', ascending = False)
     d2 = d2[['Policy', 'Pull', 'Return', 'folder']]
 
-    aggregations = {'Return':{'Mean_Return': 'mean', 'Std_Return': 'std',
-                    'Num_experiments': 'count'}}
-
-    d3 = d2.groupby('Policy').agg(aggregations)
-    d3.columns = d3.columns.droplevel()
+    d3 = d2.groupby('Policy').agg(Mean_Return = ('Return', 'mean'),
+                                  Std_Return = ('Return', 'std'),
+                                  Num_experiments = ('Return', 'count'))
+    #d3.columns = d3.columns.droplevel()
     d3 = d3.sort_values(by='Mean_Return', ascending=False)
 
     # Save csv file in the 'Experiments directory' which was given as an argument.
