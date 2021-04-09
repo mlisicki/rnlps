@@ -84,11 +84,15 @@ class Policy:
             reset_context = self.bandit.reset()
             trial.update_contexts(reset_context)
 
-        for i in range(trial_length):
+        i=0
+        while i < trial_length:
             arm = self.select(trial)
             reward, context, regret = self.bandit.pull(arm)
+            if reward is None and context is None and regret is None:
+                break
 
             trial.append(arm, reward, context, regret)
+            i += 1
 
         return trial
 
@@ -269,9 +273,12 @@ class BaseThompsonRecurrentNetwork(Policy):
             p[np.argmax(pred)] = 1.0
 
             with _printoptions(precision=4, suppress=True):
-                if np.argmax(p) in self.bandit.best_arms():
-                    cprint(msg.format(trial.length + 1, loss, pred, p), 'green')
-                else:
+                try:
+                    if np.argmax(p) in self.bandit.best_arms():
+                        cprint(msg.format(trial.length + 1, loss, pred, p), 'green')
+                    else:
+                        print(msg.format(trial.length + 1, loss, pred, p))
+                except NotImplementedError:
                     print(msg.format(trial.length + 1, loss, pred, p))
 
         return np.argmax(pred)
