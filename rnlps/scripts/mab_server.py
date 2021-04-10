@@ -1,17 +1,21 @@
 import random
+import argparse
 import sys
 sys.path.insert(0, '/Volumes/DATA/neural_combinatorial_optimization/mab/rnlps')
 import numpy as np
 from multiprocessing.connection import Listener
 from rnlps.policies.contextual_policies import ThompsonRecurrentNetwork
 
+
 class IPCBandit(object):
     def __init__(self, connection):
         self.connection = connection
         conn.send({'query': 'num_arms'})
         self.n_arms = int(conn.recv())
+        print("Number of arms: {}".format(self.n_arms))
         conn.send({'query': 'context_dims'})
         self.context_dims = int(conn.recv())
+        print("Context dimensions: {}".format(self.context_dims))
         self.step = 0
 
     def reset(self):
@@ -23,7 +27,8 @@ class IPCBandit(object):
         return context
 
     def pull(self, arm):
-        conn.send({'arm': arm, 'query': 'reward'})
+        conn.send({'arm': arm})
+        conn.send({'query': 'reward'})
         msg = conn.recv()
         if msg == "close":
             return None, None, None
@@ -49,20 +54,38 @@ class IPCBandit(object):
     def __repr__(self):
         return "IPC Bandit"
 
+def get_options(args=None):
+    parser = argparse.ArgumentParser(
+        description="RNLPS bandit server")
+
+    parser.add_argument('--n_units', type=int, nargs='+', default=[32, 32, 32], help='Three arguments describing the number of units at each layer')
+    parser.add_argument('--learning_rate', type=float, default=0.01, help='')
+    parser.add_argument('--regularise_lambda', type=float, default=0.001, help='')
+    parser.add_argument('--epochs', type=int, default=10, help='')
+    parser.add_argument('--train_every', type=int, default=32, help='')
+    parser.add_argument('--std_targets', type=float, default=0.3, help='')
+    parser.add_argument('--std_weights', type=float, default=1.0, help='')
+    opts, unknown = parser.parse_known_args(args)
+    if unknown:
+        print("Unknown args: {}".format(unknown))
+
+    return opts
+
 if __name__=="__main__":
+    opts = get_options()
     address = ('localhost', 6000)  # family is deduced to be 'AF_INET'
     listener = Listener(address, authkey=b'rnlps')
     conn = listener.accept()
     print('connection accepted from', listener.last_accepted)
 
     bandit = IPCBandit(conn)
-    policy_parameters = {"n_units": [32, 32, 32],
-                         "learning_rate": 0.01,
-                         "regularise_lambda": 0.001,
-                         "epochs": 3,
-                         "train_every": 1,
-                         "std_targets": 0.3,
-                         "std_weights": 1.0,
+    policy_parameters = {"n_units": opts.n_units,
+                         "learning_rate": opts.learning_rate,
+                         "regularise_lambda": opts.regularise_lambda,
+                         "epochs": opts.epochs,
+                         "train_every": opts.train_every,
+                         "std_targets": opts.std_targets,
+                         "std_weights": opts.std_weights,
                          "verbose": True,
                          "seed": random.randint(10000, 99999)}
     policy = ThompsonRecurrentNetwork(bandit, **policy_parameters)
