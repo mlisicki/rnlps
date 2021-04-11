@@ -1,8 +1,9 @@
 import random
 import argparse
 import sys
-sys.path.insert(0, '/Volumes/DATA/neural_combinatorial_optimization/mab/rnlps')
+sys.path.insert(0, '../../')
 import numpy as np
+import multiprocessing
 from multiprocessing.connection import Listener
 from rnlps.policies.contextual_policies import ThompsonRecurrentNetwork
 
@@ -76,6 +77,7 @@ if __name__=="__main__":
     address = ('localhost', 6000)  # family is deduced to be 'AF_INET'
     listener = Listener(address, authkey=b'rnlps')
     conn = listener.accept()
+    multiprocessing.current_process().authkey = b'rnlps'
     print('connection accepted from', listener.last_accepted)
 
     bandit = IPCBandit(conn)
