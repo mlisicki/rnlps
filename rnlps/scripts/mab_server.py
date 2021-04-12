@@ -66,6 +66,7 @@ def get_options(args=None):
     parser.add_argument('--train_every', type=int, default=32, help='')
     parser.add_argument('--std_targets', type=float, default=0.3, help='')
     parser.add_argument('--std_weights', type=float, default=1.0, help='')
+    parser.add_argument('--ipc_port', type=int, default=6000, help='Port to use for IPC.')
     opts, unknown = parser.parse_known_args(args)
     if unknown:
         print("Unknown args: {}".format(unknown))
@@ -74,7 +75,7 @@ def get_options(args=None):
 
 if __name__=="__main__":
     opts = get_options()
-    address = ('localhost', 6000)  # family is deduced to be 'AF_INET'
+    address = ('localhost', opts.ipc_port)  # family is deduced to be 'AF_INET'
     listener = Listener(address, authkey=b'rnlps')
     conn = listener.accept()
     multiprocessing.current_process().authkey = b'rnlps'
