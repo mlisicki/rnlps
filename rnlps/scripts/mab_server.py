@@ -75,6 +75,7 @@ def get_options(args=None):
 
 if __name__=="__main__":
     opts = get_options()
+    print("Parameters: {}".format(opts))
     address = ('localhost', opts.ipc_port)  # family is deduced to be 'AF_INET'
     listener = Listener(address, authkey=b'rnlps')
     conn = listener.accept()
